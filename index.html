@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#170609">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>Urodzinowy Jukebox</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Limelight&family=VT323&display=swap">
+<style>
+:root{--wine:#5a0f1f;--wine2:#2a0710;--gold:#d9a93c;--chrome:#e8e4da;--amber:#ffb84d;--pt:max(10px,env(safe-area-inset-top,0px));--pb:max(10px,env(safe-area-inset-bottom,0px))}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body{margin:0;background:radial-gradient(ellipse at 50% 0,#4a1420 0,#170609 70%) fixed;color:var(--chrome);font-family:'VT323',monospace;display:flex;justify-content:center;padding:var(--pt) 8px var(--pb);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#cab{width:min(100%,460px);min-height:calc(100dvh - var(--pt) - var(--pb));display:flex;flex-direction:column;background:linear-gradient(160deg,var(--wine),var(--wine2));border:4px solid var(--gold);border-radius:110px 110px 24px 24px/80px 80px 24px 24px;padding:16px 14px 14px;box-shadow:0 0 0 3px #000,0 20px 60px #000b,inset 0 0 40px #0008}
+h1{font:400 23px/1.1 'Limelight',serif;color:var(--gold);text-align:center;margin:10px 0 10px;text-shadow:0 0 14px #d9a93c66}
+#win{position:relative;flex:none;aspect-ratio:11/8.2;border:4px solid #b9b5ab;border-radius:14px;background:radial-gradient(circle at 50% 70%,#2b2230,#0b070e);overflow:hidden;box-shadow:inset 0 0 30px #000}
+#win::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,#fff3 0,#fff0 30%);pointer-events:none;z-index:9}
+#rail{position:absolute;left:0;right:0;top:2%;height:2.4%;background:linear-gradient(#ddd,#666);z-index:1}
+#arm{position:absolute;top:0;height:100%;width:0;left:50%;transition:left .7s ease-in-out;z-index:3}
+#stem{position:absolute;top:3%;left:-2px;width:4px;height:3%;background:linear-gradient(90deg,#999,#eee,#777);transition:height .7s ease-in-out}
+#grip{position:absolute;left:0;top:6%;width:24px;height:15px;transform:translate(-50%,-50%);background:var(--gold);border-radius:4px 4px 10px 10px;border:2px solid #7a5a12;transition:top .7s ease-in-out,width .25s}
+#grip.closed{width:16px}
+#plat{position:absolute;left:50%;top:74%;width:36%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(#555,#222 60%,#111);border:3px solid #8d8a80}
+.rec{position:absolute;width:14%;aspect-ratio:1;z-index:2;transition:left .7s ease-in-out,top .7s ease-in-out,transform .7s ease-in-out}
+.rec.snap{transition:none}
+.disc{width:100%;height:100%;border-radius:50%;background:repeating-radial-gradient(circle,#0d0d0d 0 2px,#202020 2px 3px);display:grid;place-items:center}
+.rec::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(#fff2,#fff0 20%,#fff2 50%,#fff0 70%,#fff2)}
+.lab{width:38%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font:700 9px/1 sans-serif;color:#fff;text-shadow:0 0 2px #000}
+.spin .disc{animation:sp 1.6s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.shelf{position:absolute;top:31.5%;width:16%;height:1.6%;background:#7c7770;transform:translateX(-50%);border-radius:2px}
+#scr{position:relative;flex:1;min-height:210px;margin-top:12px;background:#050302;border:5px solid #1a1a1a;border-radius:18px;overflow:hidden;box-shadow:0 0 0 3px #b9b5ab,inset 0 0 40px #000;color:var(--amber);font-size:23px;text-align:center}
+#scr::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(#0000 0 2px,#0003 2px 3px);pointer-events:none;z-index:5}
+#scr>*{position:absolute}
+#m,#im{inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+#msg{inset:0;display:grid;place-items:center;padding:0 12px;line-height:1.1}
+#menu{inset:0;display:grid;align-content:center;padding:0 10px;text-align:left;font-size:19px;line-height:1.15}
+#menu h2{margin:0 0 4px;font-weight:400;text-align:center;font-size:28px;text-shadow:0 0 8px var(--amber)}
+#menu div{display:flex;gap:.5em;align-items:baseline;padding:1px 0}
+#menu div b{flex:none;width:1em}
+#menu .bos{opacity:.3}
+#eq{bottom:8px;left:0;right:0;display:flex;gap:4px;justify-content:center;align-items:flex-end;height:36px;z-index:2}
+#eq i{width:8px;height:6px;background:var(--amber);box-shadow:0 0 6px var(--amber)}
+#eq.go i{animation:eq .6s ease-in-out infinite alternate}
+#eq i:nth-child(2n){animation-delay:.2s}#eq i:nth-child(3n){animation-delay:.4s}
+@keyframes eq{to{height:34px}}
+#hint{top:6px;left:0;right:0;z-index:4;font-size:20px;background:#000b;padding:2px 0}
+#panel{margin-top:14px;display:grid;gap:12px}
+.row{display:flex;gap:8px;justify-content:space-between;align-items:center}
+.btn{appearance:none;border:0;cursor:pointer;color:#222;font:700 20px/1 sans-serif;width:50px;height:50px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#bdb8ab 60%,#8a8578);box-shadow:0 5px 0 #5c584d,0 8px 10px #000a;transition:transform .08s,box-shadow .08s;display:grid;place-items:center;padding:0}
+.btn svg{width:22px;height:22px;fill:currentColor;stroke:currentColor;stroke-width:0}
+.btn.line svg{fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.btn:active,.btn.p{transform:translateY(4px);box-shadow:0 1px 0 #5c584d,0 2px 4px #000a}
+.btn:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+.cap{display:grid;justify-items:center;gap:7px;font-size:17px;color:var(--gold)}
+#pw{width:56px;height:56px;background:radial-gradient(circle at 35% 30%,#fff,#d9a93c 60%,#7a5a12);box-shadow:0 5px 0 #5a420c,0 8px 10px #000a}
+#led{width:10px;height:10px;border-radius:50%;background:#400;box-shadow:0 0 0 2px #000;margin-bottom:28px}
+#ctl{align-items:flex-end}
+#led.on{background:#ff3b30;box-shadow:0 0 0 2px #000,0 0 12px #ff3b30}
+#ej,#rp{border-radius:12px;width:64px;height:44px}
+.num{flex:1;border-radius:12px;width:auto;height:46px}
+@media (min-width:600px){#cab{min-height:0}#scr{flex:none;aspect-ratio:4/3}}
+@media (prefers-reduced-motion:reduce){.spin .disc,#eq.go i{animation-duration:6s}}
+</style>
+</head>
+<body>
+<div id="cab">
+  <h1 id="baslik">Urodzinowy Jukebox</h1>
+  <div id="win">
+    <div id="rail"></div><div id="plat"></div>
+    <div id="arm"><div id="stem"></div><div id="grip"></div></div>
+  </div>
+  <div id="scr">
+    <div id="menu" hidden></div>
+    <div id="msg" hidden></div>
+    <video id="m" playsinline webkit-playsinline hidden></video>
+    <img id="im" alt="" hidden>
+    <div id="eq" hidden><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div id="hint" hidden>▶ Dotknij ekranu</div>
+  </div>
+  <div id="panel">
+    <div class="row" id="ctl">
+      <div class="cap"><button class="btn line" id="pw" aria-label="Włącz / wyłącz"><svg viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg></button><span>zasilanie</span></div>
+      <div id="led"></div>
+      <div class="cap"><button class="btn" id="ej" aria-label="Wysuń płytę"><svg viewBox="0 0 24 24"><path d="M12 5 4 14h16z"/><rect x="4" y="16" width="16" height="3" rx="1"/></svg></button><span>wysuń</span></div>
+      <div class="cap"><button class="btn line" id="rp" aria-label="Odtwórz ponownie"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v5h5"/></svg></button><span>powtórz</span></div>
+    </div>
+    <div class="row" id="nums"></div>
+  </div>
+</div>
+
+<script>
+/* ===== AYARLAR ===== */
+const BASLIK = "Urodzinowy Jukebox";   // üstteki başlık
+const PLAK_ADLARI = [                  // ekrandaki liste (5 plak)
+  "Płyta 1",
+  "Od Twojej kochanej przyszłej szwagierki",
+  "Od Twojej kochanej przyszłej teściowej",
+  "Płyta 4",
+  "Płyta 5"
+];
+const DIR = "medya";                   // dosya klasörü
+/* Dosyalar: medya/plak1_resim.jpg, medya/plak1_ses.mp3, medya/plak1_video.mp4 ... plak5 */
+
+const N = PLAK_ADLARI.length;
+const $ = s => document.querySelector(s);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const T = 760;
+const win = $('#win'), arm = $('#arm'), grip = $('#grip'), stem = $('#stem'), scr = $('#scr'), m = $('#m'), im = $('#im'), eq = $('#eq'), hint = $('#hint');
+$('#baslik').textContent = BASLIK;
+
+let on = false, busy = false, cur = null, carry = null;
+const slotX = i => (i + .5) * 100 / N, SLOT_Y = 20, CARRY = 43, PLAT = [50, 74], SC = 2.4;
+
+/* plaklar ve numara tuşları */
+const recs = [];
+for (let i = 0; i < N; i++) {
+  const r = document.createElement('div');
+  r.className = 'rec';
+  r.innerHTML = `<div class="disc"><div class="lab" style="background:hsl(${i*70},70%,45%)">${i+1}</div></div>`;
+  place(r, slotX(i), SLOT_Y, 1); win.append(r); recs.push(r);
+  const s = document.createElement('div'); s.className = 'shelf'; s.style.left = slotX(i) + '%'; win.append(s);
+  const b = document.createElement('button'); b.className = 'btn num'; b.textContent = i + 1;
+  b.onclick = () => choose(i); $('#nums').append(b);
+}
+function place(el, x, y, s) { el.style.left = x + '%'; el.style.top = y + '%'; el.style.transform = `translate(-50%,-50%) scale(${s})`; }
+function mv(x, y, s = 1) { arm.style.left = x + '%'; grip.style.top = y + '%'; stem.style.height = (y - 3) + '%'; if (carry) place(carry, x, y, s); return wait(T); }
+mv(50, 6);
+
+/* ekran */
+function show(...ids) { ['menu','msg','m','im','eq'].forEach(id => $('#' + id).hidden = !ids.includes(id)); hint.hidden = true; }
+function say(t) { $('#msg').innerHTML = t; show('msg'); }
+const menu = $('#menu');
+menu.innerHTML = '<h2>WYBIERZ PŁYTĘ</h2>' + PLAK_ADLARI.map((n, i) => `<div><b>${i+1}</b><span>${n}</span></div>`).join('');
+function showMenu() { show('menu'); scr.animate([{transform:'scale(0,.02)',opacity:0},{transform:'scale(1,.02)',opacity:1,offset:.5},{transform:'scale(1,1)'}],{duration:450,easing:'ease-out'}); }
+async function collapse() { await scr.animate([{transform:'scale(1,1)'},{transform:'scale(1,.02)',offset:.5},{transform:'scale(0,.02)',opacity:0}],{duration:450,easing:'ease-in',fill:'forwards'}).finished; scr.getAnimations().forEach(a => a.cancel()); show(); }
+
+/* mekanik tık sesi */
+let ac; function tick(f = 180) { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = f; o.type = 'square'; g.gain.setValueAtTime(.05, ac.currentTime); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .08); o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + .09); } catch (e) {} }
+function press(el) { el.classList.add('p'); setTimeout(() => el.classList.remove('p'), 160); tick(); }
+
+/* medya dosyalarını otomatik bul */
+const cache = {}, http = location.protocol.startsWith('http');
+function test(kind, url) {
+  if (http) return fetch(url, {method: 'HEAD'}).then(r => r.ok ? url : null).catch(() => null);
+  return new Promise(res => {
+    let el;
+    if (kind === 'resim') { el = new Image(); el.onload = () => res(url); }
+    else { el = document.createElement(kind === 'video' ? 'video' : 'audio'); el.preload = 'metadata'; el.onloadedmetadata = () => res(url); }
+    el.onerror = () => res(null); setTimeout(() => res(null), 6000); el.src = url;
+  });
+}
+const probe = (n, kind, exts) => Promise.all(exts.map(e => test(kind, `${DIR}/plak${n}_${kind}.${e}`))).then(r => r.find(Boolean) || null);
+const assets = i => cache[i] ??= Promise.all([
+  probe(i+1, 'video', ['mp4','MP4','mov','MOV','webm','m4v']),
+  probe(i+1, 'ses',   ['mp3','MP3','m4a','M4A','wav','ogg']),
+  probe(i+1, 'resim', ['jpg','JPG','jpeg','JPEG','png','PNG','webp','heic','HEIC','gif'])
+]).then(([video, ses, resim]) => ({video, ses, resim}));
+recs.forEach((_, i) => assets(i).then(a => { if (!a.video && !a.ses && !a.resim) menu.children[i + 1].classList.add('bos'); }));
+
+async function startMedia(i) {
+  const a = await assets(i);
+  m.controls = false;
+  if (a.video) { m.src = a.video; show('m'); }
+  else if (a.ses) { m.src = a.ses; if (a.resim) { im.src = a.resim; show('im', 'eq'); } else { say(`♪ PŁYTA ${i+1} ♪`); eq.hidden = false; } }
+  else if (a.resim) { im.src = a.resim; show('im'); }
+  else { say('TA PŁYTA JEST PUSTA'); return; }
+  if (a.video || a.ses) m.play().catch(() => { hint.hidden = false; });
+}
+function stopMedia() { m.pause(); m.removeAttribute('src'); m.load(); eq.classList.remove('go'); hint.hidden = true; }
+m.onplay = () => { eq.classList.add('go'); hint.hidden = true; };
+m.onpause = m.onended = () => eq.classList.remove('go');
+scr.onclick = () => { if (on && !busy && cur !== null && m.getAttribute('src')) m.paused ? m.play().catch(() => {}) : m.pause(); };
+
+/* mekanizma */
+async function load(i) {
+  say(`PŁYTA ${i+1}<br>WCZYTYWANIE...`);
+  const x = slotX(i), r = recs[i];
+  await mv(x, 6); await mv(x, SLOT_Y);
+  grip.classList.add('closed'); tick(120); await wait(300);
+  carry = r; await mv(x, CARRY); await mv(50, CARRY);
+  await mv(PLAT[0], PLAT[1], SC);
+  grip.classList.remove('closed'); tick(120); carry = null; await wait(250);
+  await mv(50, 6); r.classList.add('spin'); cur = i;
+}
+async function unload() {
+  const i = cur, x = slotX(i), r = recs[i];
+  r.classList.remove('spin');
+  await mv(...PLAT);
+  grip.classList.add('closed'); tick(120); await wait(300);
+  carry = r; await mv(50, CARRY, 1); await mv(x, CARRY); await mv(x, SLOT_Y);
+  grip.classList.remove('closed'); tick(120); carry = null; await wait(250);
+  await mv(x, 6); await mv(50, 6); cur = null;
+}
+
+async function choose(i) {
+  if (!on || busy || cur === i) return;
+  press($('#nums').children[i]); busy = true;
+  if (cur !== null) { stopMedia(); say('ZMIANA PŁYTY...'); await unload(); }
+  await load(i); await startMedia(i); busy = false;
+}
+async function eject() {
+  press($('#ej'));
+  if (!on || busy || cur === null) return;
+  busy = true; stopMedia(); await collapse(); say('WYSUWANIE PŁYTY...'); scr.animate([{opacity:0},{opacity:1}],{duration:300});
+  await unload(); showMenu(); busy = false;
+}
+function replay() {
+  press($('#rp'));
+  if (!on || busy || cur === null) return;
+  if (m.getAttribute('src')) { m.currentTime = 0; m.play().catch(() => { hint.hidden = false; }); }
+  else scr.animate([{opacity:.15},{opacity:1}],{duration:450});
+}
+async function power() {
+  press($('#pw')); if (busy) return; busy = true; on = !on;
+  $('#led').classList.toggle('on', on);
+  if (on) {
+    m.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='; m.play().catch(() => {}); // iPhone ses izni
+    say('WŁĄCZANIE...'); await wait(1100); m.removeAttribute('src'); showMenu();
+  } else {
+    stopMedia(); await collapse();
+    if (cur !== null) { const r = recs[cur]; r.classList.remove('spin'); r.classList.add('snap'); place(r, slotX(cur), SLOT_Y, 1); setTimeout(() => r.classList.remove('snap'), 60); grip.classList.remove('closed'); carry = null; cur = null; mv(50, 6); }
+  }
+  busy = false;
+}
+$('#pw').onclick = power; $('#ej').onclick = eject; $('#rp').onclick = replay;
+addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k >= '1' && k <= String(N)) choose(+k - 1); else if (k === 'e') eject(); else if (k === 'r') replay(); else if (k === 'p') power(); });
+</script>
+</body>
+</html>
